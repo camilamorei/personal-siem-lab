@@ -12,7 +12,7 @@
     </input>
   </fieldset>
 
-  <!-- Linha 1: números principais -->
+  <!-- Row 1: key numbers -->
   <row>
     <panel>
       <title>Total authentications</title>
@@ -62,7 +62,7 @@
     </panel>
   </row>
 
-  <!-- Linha 2: evolução no tempo -->
+  <!-- Row 2: activity over time -->
   <row>
     <panel>
       <title>Authentication results over time</title>
@@ -82,7 +82,7 @@
     </panel>
   </row>
 
-  <!-- Linha 3: quem é atacado e de onde -->
+  <!-- Row 3: who is targeted and from where -->
   <row>
     <panel>
       <title>Most targeted users (failed logins)</title>
@@ -126,7 +126,7 @@
     </panel>
   </row>
 
-  <!-- Linha 4: detecções -->
+  <!-- Row 4: detections -->
   <row>
     <panel>
       <title>DET-01 · Brute force (≥ 5 failures, same IP + user, 5 min)</title>
@@ -181,7 +181,7 @@
     </panel>
   </row>
 
-  <!-- Linha 5: eventos recentes para investigação -->
+  <!-- Row 5: recent events for investigation -->
   <row>
     <panel>
       <title>Recent failed logins</title>

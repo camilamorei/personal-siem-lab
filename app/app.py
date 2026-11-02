@@ -7,7 +7,7 @@ from security_logger import log_auth_event
 
 app = Flask(__name__)
 
-# Usuários de teste fictícios. Só os hashes ficam no código.
+# Fictitious test users. Only the password hashes are stored in the code.
 # alice -> Alice@2026 | bob -> Bob@2026
 USERS = {
     "alice": "scrypt:32768:8:1$WCGz3W8yki0Fr19c$cd89521776f9b8d0d10d3ea9aa693b19ba87b51992752ec6259dddc702da9e0e75076869f41a55179194c25a1d0f7c4f7932f8ef2541f294a065144268bf61fa",
@@ -35,7 +35,7 @@ def home():
                 timestamp=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
             ), 200
 
-        # A tela mostra uma mensagem genérica, mas o log guarda o motivo real
+        # The UI shows a generic message, but the log keeps the real reason
         reason = "invalid_password" if stored_hash else "unknown_user"
         log_auth_event(username, "failure", src_ip, user_agent, reason)
 

@@ -1,4 +1,4 @@
-/* ===== Tema: cores e medidas em um lugar só ===== */
+/* ===== Theme: colors and sizes in one place ===== */
 :root {
     --bg: #060a13;
     --panel: #0a101d;
@@ -17,7 +17,7 @@
 
 * { box-sizing: border-box; }
 
-/* Garante que elementos com o atributo hidden (inclusive SVGs) fiquem escondidos */
+/* Make sure elements with the hidden attribute (including SVGs) stay hidden */
 [hidden] { display: none !important; }
 
 body {
@@ -35,7 +35,7 @@ body {
     min-height: 100vh;
 }
 
-/* ===== Lado esquerdo (apresentação) ===== */
+/* ===== Left side (intro) ===== */
 .hero {
     position: relative;
     overflow: hidden;
@@ -151,7 +151,7 @@ body {
     color: var(--muted);
 }
 
-/* Janela de terminal decorativa */
+/* Decorative terminal window */
 .terminal {
     max-width: 560px;
     overflow: hidden;
@@ -200,7 +200,7 @@ body {
 .t-fail  { color: var(--danger); }
 .t-alert { color: var(--warning); }
 
-/* ===== Lado direito (formulário) ===== */
+/* ===== Right side (form) ===== */
 .panel {
     display: flex;
     align-items: center;
@@ -239,7 +239,7 @@ body {
     color: #c9d4e5;
 }
 
-/* Campo com ícone dentro */
+/* Input with an icon inside */
 .input { position: relative; }
 
 .input > svg {
@@ -279,7 +279,7 @@ body {
 
 .input:focus-within > svg { color: var(--accent); }
 
-/* Botão de mostrar/ocultar senha */
+/* Show/hide password button */
 .toggle {
     position: absolute;
     right: 6px;
@@ -299,7 +299,7 @@ body {
 .toggle:hover { color: var(--text); background: rgba(255, 255, 255, 0.05); }
 .toggle svg { width: 18px; height: 18px; }
 
-/* Botão principal */
+/* Primary button */
 .btn {
     width: 100%;
     height: 48px;
@@ -340,7 +340,7 @@ body {
 
 .btn.secondary:hover { border-color: var(--accent); }
 
-/* Aviso de erro (treme ao aparecer) */
+/* Error alert (shakes when shown) */
 .alert {
     display: flex;
     align-items: center;
@@ -378,7 +378,7 @@ body {
 
 .note svg { width: 14px; height: 14px; }
 
-/* ===== Página de acesso autorizado ===== */
+/* ===== Access granted page ===== */
 .center {
     min-height: 100vh;
     display: grid;
@@ -452,7 +452,7 @@ body {
     font-size: 13px;
 }
 
-/* ===== Celular: esconde o lado esquerdo ===== */
+/* ===== Mobile: hide the left side ===== */
 .mobile-only { display: none; }
 
 @media (max-width: 900px) {
@@ -461,7 +461,7 @@ body {
     .mobile-only { display: flex; }
 }
 
-/* Respeita quem prefere menos animação */
+/* Respect users who prefer reduced motion */
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
         animation: none !important;

@@ -3,7 +3,7 @@ import logging
 from datetime import datetime, timezone
 from pathlib import Path
 
-# logs/ fica na raiz do projeto, um nível acima da pasta app/
+# logs/ lives at the project root, one level above app/
 LOG_DIR = Path(__file__).resolve().parent.parent / "logs"
 LOG_FILE = LOG_DIR / "auth.log"
 
@@ -18,7 +18,7 @@ logger.addHandler(handler)
 
 
 def log_auth_event(username, result, src_ip, user_agent, reason=None):
-    """Grava um evento de autenticação como uma linha JSON em logs/auth.log."""
+    """Write an authentication event as one JSON line to logs/auth.log."""
     event = {
         "timestamp": datetime.now(timezone.utc).isoformat(timespec="milliseconds"),
         "app": "personal-siem-lab",
