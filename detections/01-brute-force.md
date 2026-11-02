@@ -17,18 +17,20 @@ passwords for a known, existing user.
 ## Logic
 
 1. Keep only failed logins (`result=failure`).
-2. Group events into 5-minute buckets (`bin _time span=5m`).
-3. Count failures per bucket, per source IP, per user.
-4. Alert when the count reaches the threshold.
+2. Save each event's exact time (`event_time`) before bucketing.
+3. Group events into 5-minute buckets (`bin _time span=5m`).
+4. Count failures per bucket, per source IP, per user.
+5. Alert when the count reaches the threshold.
 
 ## SPL
 
 ```spl
 index=siem_lab sourcetype=siem_lab:auth result=failure
+| eval event_time=_time
 | bin _time span=5m
 | stats count AS failures,
-        min(_time) AS first_seen,
-        max(_time) AS last_seen,
+        min(event_time) AS first_seen,
+        max(event_time) AS last_seen,
         values(reason) AS reasons
         BY _time, src_ip, user
 | where failures >= 5
