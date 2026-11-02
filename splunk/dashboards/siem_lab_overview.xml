@@ -1,0 +1,201 @@
+<form version="1.1" theme="dark">
+  <label>Personal SIEM Lab — Authentication Security</label>
+  <description>Authentication events from the Flask lab app (index=siem_lab), collected by the Splunk Universal Forwarder.</description>
+
+  <fieldset submitButton="false">
+    <input type="time" token="tr">
+      <label>Time range</label>
+      <default>
+        <earliest>-24h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+
+  <!-- Linha 1: números principais -->
+  <row>
+    <panel>
+      <title>Total authentications</title>
+      <single>
+        <search>
+          <query>index=siem_lab sourcetype=siem_lab:auth | stats count</query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+      </single>
+    </panel>
+    <panel>
+      <title>Successful logins</title>
+      <single>
+        <search>
+          <query>index=siem_lab sourcetype=siem_lab:auth result=success | stats count</query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+        <option name="useColors">1</option>
+        <option name="rangeValues">[0]</option>
+        <option name="rangeColors">["0x53a051","0x53a051"]</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Failed logins</title>
+      <single>
+        <search>
+          <query>index=siem_lab sourcetype=siem_lab:auth result=failure | stats count</query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+        <option name="useColors">1</option>
+        <option name="rangeValues">[0]</option>
+        <option name="rangeColors">["0x53a051","0xdc4e41"]</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Unique source IPs</title>
+      <single>
+        <search>
+          <query>index=siem_lab sourcetype=siem_lab:auth | stats dc(src_ip)</query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+      </single>
+    </panel>
+  </row>
+
+  <!-- Linha 2: evolução no tempo -->
+  <row>
+    <panel>
+      <title>Authentication results over time</title>
+      <chart>
+        <search>
+          <query>index=siem_lab sourcetype=siem_lab:auth | timechart count by result</query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.fieldColors">{"failure": 0xdc4e41, "success": 0x53a051}</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.text">Attempts</option>
+        <option name="height">280</option>
+      </chart>
+    </panel>
+  </row>
+
+  <!-- Linha 3: quem é atacado e de onde -->
+  <row>
+    <panel>
+      <title>Most targeted users (failed logins)</title>
+      <chart>
+        <search>
+          <query>index=siem_lab sourcetype=siem_lab:auth result=failure
+| stats count AS failures BY user
+| sort -failures
+| head 10</query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+        <option name="charting.chart">bar</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.seriesColors">[0xdc4e41]</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Source IPs with most attempts</title>
+      <chart>
+        <search>
+          <query>index=siem_lab sourcetype=siem_lab:auth
+| stats count(eval(result="failure")) AS failure,
+        count(eval(result="success")) AS success
+        BY src_ip
+| eval total=failure+success
+| sort -total
+| head 10
+| fields - total</query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.fieldColors">{"failure": 0xdc4e41, "success": 0x53a051}</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+      </chart>
+    </panel>
+  </row>
+
+  <!-- Linha 4: detecções -->
+  <row>
+    <panel>
+      <title>DET-01 · Brute force (≥ 5 failures, same IP + user, 5 min)</title>
+      <table>
+        <search>
+          <query><![CDATA[index=siem_lab sourcetype=siem_lab:auth result=failure
+| eval event_time=_time
+| bin _time span=5m
+| stats count AS failures, min(event_time) AS first_seen, max(event_time) AS last_seen BY _time, src_ip, user
+| where failures >= 5
+| eval first_seen=strftime(first_seen, "%Y-%m-%d %H:%M:%S"), last_seen=strftime(last_seen, "%Y-%m-%d %H:%M:%S")
+| table first_seen, last_seen, src_ip, user, failures
+| sort -failures]]></query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+      </table>
+    </panel>
+    <panel>
+      <title>DET-02 · Password spraying (&gt; 5 users, same IP, 15 min)</title>
+      <table>
+        <search>
+          <query><![CDATA[index=siem_lab sourcetype=siem_lab:auth result=failure
+| eval event_time=_time
+| bin _time span=15m
+| stats dc(user) AS distinct_users, count AS failures, min(event_time) AS first_seen BY _time, src_ip
+| where distinct_users > 5
+| eval first_seen=strftime(first_seen, "%Y-%m-%d %H:%M:%S")
+| table first_seen, src_ip, distinct_users, failures
+| sort -distinct_users]]></query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+      </table>
+    </panel>
+    <panel>
+      <title>DET-03 · Success after failures (possible compromise)</title>
+      <table>
+        <search>
+          <query><![CDATA[index=siem_lab sourcetype=siem_lab:auth
+| eval event_time=_time
+| eval fail_time=if(result="failure", event_time, null()), success_time=if(result="success", event_time, null())
+| bin _time span=10m
+| stats count(fail_time) AS failures, count(success_time) AS successes, min(fail_time) AS first_failure, max(success_time) AS compromised_at BY _time, src_ip, user
+| where failures >= 5 AND successes >= 1 AND compromised_at > first_failure
+| eval compromised_at=strftime(compromised_at, "%Y-%m-%d %H:%M:%S")
+| table compromised_at, src_ip, user, failures]]></query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+      </table>
+    </panel>
+  </row>
+
+  <!-- Linha 5: eventos recentes para investigação -->
+  <row>
+    <panel>
+      <title>Recent failed logins</title>
+      <table>
+        <search>
+          <query>index=siem_lab sourcetype=siem_lab:auth result=failure
+| sort -_time
+| table _time, src_ip, user, reason, user_agent
+| head 20</query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>
