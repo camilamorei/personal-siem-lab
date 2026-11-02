@@ -3,6 +3,8 @@ from datetime import datetime, timezone
 from flask import Flask, render_template, request
 from werkzeug.security import check_password_hash
 
+from security_logger import log_auth_event
+
 app = Flask(__name__)
 
 # Usuários de teste fictícios. Só os hashes ficam no código.
@@ -21,8 +23,11 @@ def home():
         password = request.form.get("password", "")
 
         stored_hash = USERS.get(username)
+        src_ip = request.remote_addr
+        user_agent = request.headers.get("User-Agent", "")
 
         if stored_hash and check_password_hash(stored_hash, password):
+            log_auth_event(username, "success", src_ip, user_agent)
             return render_template(
                 "welcome.html",
                 username=username,
@@ -30,9 +35,13 @@ def home():
                 timestamp=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
             ), 200
 
+        # A tela mostra uma mensagem genérica, mas o log guarda o motivo real
+        reason = "invalid_password" if stored_hash else "unknown_user"
+        log_auth_event(username, "failure", src_ip, user_agent, reason)
+
         return render_template(
             "login.html",
-            error="Usuário ou senha inválidos.",
+            error="Invalid username or password.",
             username=username,
         ), 401
 

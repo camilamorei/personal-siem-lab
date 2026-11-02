@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Acesso autorizado · Personal SIEM Lab{% endblock %}
+{% block title %}Access granted · Personal SIEM Lab{% endblock %}
 
 {% block content %}
 <div class="center">
@@ -9,17 +9,17 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
         </div>
 
-        <h1>Acesso autorizado</h1>
-        <p class="subtitle">Este login acabou de virar um evento de segurança.</p>
+        <h1>Access granted</h1>
+        <p class="subtitle">This login just became a security event.</p>
 
         <dl class="details">
-            <div><dt>Usuário</dt><dd>{{ username }}</dd></div>
-            <div><dt>Resultado</dt><dd class="t-ok">SUCCESS</dd></div>
-            <div><dt>IP de origem</dt><dd>{{ ip }}</dd></div>
-            <div><dt>Data e hora</dt><dd>{{ timestamp }}</dd></div>
+            <div><dt>Username</dt><dd>{{ username }}</dd></div>
+            <div><dt>Result</dt><dd class="t-ok">SUCCESS</dd></div>
+            <div><dt>Source IP</dt><dd>{{ ip }}</dd></div>
+            <div><dt>Timestamp</dt><dd>{{ timestamp }}</dd></div>
         </dl>
 
-        <a href="{{ url_for('home') }}" class="btn secondary">Sair</a>
+        <a href="{{ url_for('home') }}" class="btn secondary">Sign out</a>
     </main>
 </div>
 {% endblock %}
